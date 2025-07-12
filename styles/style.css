@@ -58,20 +58,23 @@ nav ul li a {
   transition: color 0.3s, font-weight 0.3s;
 }
 
-nav ul li a:hover {
+nav ul li a:hover,
+nav ul li a.active {
+  /* Tambahkan .active untuk penyorotan link */
   color: #6d5a5a;
   font-weight: bold;
 }
 
 /* Mobile Menu */
 .menu-toggle {
-  display: none;
+  display: none; /* Sembunyikan secara default di desktop */
   background: none;
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
   color: #000;
   transition: color 0.3s;
+  z-index: 150; /* Pastikan di atas menu nav saat dibuka */
 }
 
 /* Hero Section */
@@ -511,7 +514,7 @@ footer {
   text-align: center;
 }
 
-/* Dark Mode Toggle */
+/* Dark Mode Toggle Button */
 .dark-mode-toggle {
   position: fixed;
   bottom: 2rem;
@@ -685,38 +688,92 @@ body.dark-mode footer {
     grid-template-columns: repeat(2, 1fr);
   }
 
+  /* Tampilkan tombol hamburger */
+  .menu-toggle {
+    display: block;
+    color: #000; /* Warna ikon hamburger */
+  }
+
+  /* Gaya untuk menu navigasi saat dibuka sebagai overlay */
+  nav {
+    position: fixed; /* Posisikan menu sebagai overlay */
+    top: 0;
+    right: -100%; /* Sembunyikan di luar layar kanan */
+    width: 250px; /* Lebar menu */
+    height: 100%;
+    background-color: #fff; /* Latar belakang putih untuk menu */
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+    transition: right 0.3s ease-in-out; /* Animasi geser */
+    z-index: 140; /* Di bawah tombol toggle */
+    overflow-y: auto; /* Aktifkan scroll jika konten menu banyak */
+  }
+
+  /* Saat menu aktif (kelas 'show' ditambahkan oleh JS) */
+  nav.show {
+    right: 0; /* Geser masuk ke dalam layar */
+  }
+
   nav ul {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background-color: #fff;
-    flex-direction: column;
-    padding: 1rem 5%;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  }
-
-  body.dark-mode nav ul {
-    background-color: #1e1e1e;
-  }
-
-  nav ul.show {
-    display: flex;
+    flex-direction: column; /* Item menu vertikal */
+    padding: 80px 20px 20px; /* Padding agar tidak terlalu rapat dengan atas */
+    gap: 0; /* Hapus gap antar item */
+    display: flex; /* Paksa display flex agar selalu terlihat jika nav.show aktif */
   }
 
   nav ul li {
-    margin: 0;
-    padding: 0.5rem 0;
+    width: 100%; /* Agar link memenuhi lebar menu */
   }
 
-  .menu-toggle {
-    display: block;
+  nav ul li a {
+    color: #000; /* Warna teks hitam untuk menu putih */
+    font-size: 1.1rem;
+    padding: 12px 0; /* Tambah padding vertikal untuk area klik lebih besar */
+    display: block; /* Agar link memenuhi lebar */
+    border-bottom: 1px solid #eee; /* Garis pemisah antar item menu */
   }
 
-  .cta-container {
-    flex-direction: column;
-    gap: 1rem;
+  nav ul li:last-child a {
+    border-bottom: none; /* Hapus border di item terakhir */
+  }
+
+  nav ul li a:hover {
+    background-color: #f5f5f5; /* Efek hover pada item menu */
+    color: #c58c6d;
+  }
+
+  /* --- PENTING: BAGIAN INI DIHAPUS UNTUK MENGHILANGKAN FADE HITAM PADA MODE TERANG/TOGGLE --- */
+  /* body.menu-open::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 130;
+  } */
+
+  /* Dark Mode Adjustments for Hamburger Menu */
+  body.dark-mode .menu-toggle {
+    color: #f5f5f5; /* Warna ikon hamburger di dark mode */
+  }
+
+  body.dark-mode nav {
+    background-color: #1e1e1e; /* Latar belakang gelap untuk menu di dark mode */
+  }
+
+  body.dark-mode nav ul li a {
+    color: #f5f5f5; /* Warna teks putih untuk menu gelap */
+    border-bottom-color: #333; /* Warna border di dark mode */
+  }
+
+  body.dark-mode nav ul li a:hover {
+    background-color: #2a2a2a; /* Efek hover di dark mode */
+    color: #c58c6d;
+  }
+
+  .hero-content h1 {
+    font-size: 2.5rem;
   }
 }
 
@@ -726,6 +783,15 @@ body.dark-mode footer {
   }
 
   .hero-content h1 {
-    font-size: 2.5rem;
+    font-size: 2rem; /* Sedikit lebih kecil untuk layar sangat kecil */
+  }
+
+  /* Menyesuaikan padding untuk layar sangat kecil */
+  header,
+  .hero,
+  .content-wrapper,
+  footer {
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 }

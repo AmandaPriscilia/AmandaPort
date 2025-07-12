@@ -1,92 +1,103 @@
+// script/index.js
+
 document.addEventListener('DOMContentLoaded', function () {
-  // Mobile menu toggle
+  // --- Mobile Menu Toggle ---
   const menuToggle = document.querySelector('.menu-toggle');
-  const navMenu = document.querySelector('nav ul');
+  const nav = document.querySelector('nav');
+  const navLinks = document.querySelectorAll('nav ul li a');
 
-  menuToggle.addEventListener('click', function () {
-    navMenu.classList.toggle('show');
-    if (navMenu.classList.contains('show')) {
-      navMenu.style.display = 'flex';
-      navMenu.style.flexDirection = 'column';
-      navMenu.style.position = 'absolute';
-      navMenu.style.top = '100%';
-      navMenu.style.left = '0';
-      navMenu.style.right = '0';
-      navMenu.style.backgroundColor = '#fff';
-      navMenu.style.padding = '1rem 5%';
-      navMenu.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+  // Function to close the mobile menu
+  function closeMenu() {
+    nav.classList.remove('show');
+    document.body.classList.remove('menu-open'); // Menghapus kelas ini juga penting untuk potensi overlay jika Anda memutuskan untuk menambahkannya lagi di masa depan
+  }
 
-      if (document.body.classList.contains('dark-mode')) {
-        navMenu.style.backgroundColor = '#1e1e1e';
-      }
-    } else {
-      navMenu.style.display = 'none';
+  // Event listener for the hamburger menu toggle button
+  if (menuToggle) {
+    menuToggle.addEventListener('click', function () {
+      nav.classList.toggle('show');
+      document.body.classList.toggle('menu-open'); // Menambahkan/menghapus kelas ini untuk mengontrol status menu
+    });
+  }
+
+  // Close menu when a navigation link is clicked (for smooth scrolling)
+  navLinks.forEach((link) => {
+    link.addEventListener('click', function () {
+      // Small delay to allow scroll animation to start before closing menu
+      setTimeout(closeMenu, 300);
+    });
+  });
+
+  // Close menu when clicking outside the menu (on the body/overlay area)
+  document.body.addEventListener('click', function (event) {
+    // Check if the body has 'menu-open' class AND the click target is NOT the toggle button AND NOT inside the nav
+    if (document.body.classList.contains('menu-open') && !nav.contains(event.target) && !menuToggle.contains(event.target)) {
+      closeMenu();
     }
   });
 
-  // Smooth scrolling for anchor links
+  // --- Smooth Scrolling for Anchor Links ---
   document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
     anchor.addEventListener('click', function (e) {
       e.preventDefault();
 
       const targetId = this.getAttribute('href');
-      if (targetId === '#') return;
+      if (targetId === '#') return; // Prevent scrolling if href is just '#'
 
       const targetElement = document.querySelector(targetId);
       if (targetElement) {
         window.scrollTo({
-          top: targetElement.offsetTop - 100,
+          top: targetElement.offsetTop - 100, // Adjust offset for sticky header
           behavior: 'smooth',
         });
-
-        // Close mobile menu if open
-        if (navMenu.classList.contains('show')) {
-          navMenu.classList.remove('show');
-          navMenu.style.display = 'none';
-        }
+        // Menu closing is already handled by navLinks.forEach above or body click listener
       }
     });
   });
 
-  // Dark mode toggle
+  // --- Dark Mode Toggle ---
   const darkModeToggle = document.createElement('div');
   darkModeToggle.className = 'dark-mode-toggle';
-  darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+  darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>'; // Default icon: moon (light mode)
   document.body.appendChild(darkModeToggle);
 
+  const darkModeIcon = darkModeToggle.querySelector('i');
+
+  // --- Initialize Dark Mode on Page Load ---
+  const savedTheme = localStorage.getItem('theme');
+
+  if (savedTheme === 'dark') {
+    // If saved preference is 'dark', activate dark mode
+    document.body.classList.add('dark-mode');
+    if (darkModeIcon) {
+      darkModeIcon.classList.remove('fa-moon');
+      darkModeIcon.classList.add('fa-sun'); // Change icon to sun
+    }
+  } else {
+    // If no preference saved, or preference is 'light', ensure body does not have dark-mode
+    document.body.classList.remove('dark-mode');
+    if (darkModeIcon) {
+      darkModeIcon.classList.remove('fa-sun');
+      darkModeIcon.classList.add('fa-moon'); // Change icon to moon
+    }
+  }
+
+  // --- Event Listener for Dark Mode Toggle ---
   darkModeToggle.addEventListener('click', function () {
     document.body.classList.toggle('dark-mode');
 
-    const icon = this.querySelector('i');
     if (document.body.classList.contains('dark-mode')) {
-      icon.classList.remove('fa-moon');
-      icon.classList.add('fa-sun');
-      localStorage.setItem('darkMode', 'enabled');
-
-      // Adjust nav menu background for dark mode if open
-      if (navMenu.classList.contains('show')) {
-        navMenu.style.backgroundColor = '#1e1e1e';
-      }
+      darkModeIcon.classList.remove('fa-moon');
+      darkModeIcon.classList.add('fa-sun');
+      localStorage.setItem('theme', 'dark'); // Save 'dark' preference
     } else {
-      icon.classList.remove('fa-sun');
-      icon.classList.add('fa-moon');
-      localStorage.setItem('darkMode', 'disabled');
-
-      if (navMenu.classList.contains('show')) {
-        navMenu.style.backgroundColor = '#fff';
-      }
+      darkModeIcon.classList.remove('fa-sun');
+      darkModeIcon.classList.add('fa-moon');
+      localStorage.setItem('theme', 'light'); // Save 'light' preference
     }
   });
 
-  // Check for saved dark mode preference
-  if (localStorage.getItem('darkMode') === 'enabled') {
-    document.body.classList.add('dark-mode');
-    const icon = darkModeToggle.querySelector('i');
-    icon.classList.remove('fa-moon');
-    icon.classList.add('fa-sun');
-  }
-
-  // Project card hover effect enhancement
+  // --- Project Card Hover Effect Enhancement ---
   const projectCards = document.querySelectorAll('.project-card');
   projectCards.forEach((card) => {
     card.addEventListener('mouseenter', function () {
@@ -100,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  // Active navigation link highlighting
+  // --- Active Navigation Link Highlighting ---
   const sections = document.querySelectorAll('section[id]');
   const navItems = document.querySelectorAll('nav ul li a');
 
@@ -108,29 +119,31 @@ document.addEventListener('DOMContentLoaded', function () {
     let current = '';
 
     sections.forEach((section) => {
-      const sectionTop = section.offsetTop;
+      const sectionTop = section.offsetTop - 150; // Offset for sticky header/better UX
       const sectionHeight = section.clientHeight;
 
-      if (pageYOffset >= sectionTop - 150) {
+      if (pageYOffset >= sectionTop && pageYOffset < sectionTop + sectionHeight) {
         current = section.getAttribute('id');
       }
     });
 
     navItems.forEach((item) => {
-      item.classList.remove('active');
+      item.classList.remove('active'); // Remove 'active' from all links
       if (item.getAttribute('href') === `#${current}`) {
-        item.classList.add('active');
+        item.classList.add('active'); // Add 'active' to the matching link
       }
     });
   });
 
-  // Form submission handling (if you add a contact form later)
+  window.dispatchEvent(new Event('scroll')); // Trigger scroll event once on load to set initial active link
+
+  // --- Form Submission Handling (Placeholder) ---
   const contactForm = document.getElementById('contact-form');
   if (contactForm) {
     contactForm.addEventListener('submit', function (e) {
-      e.preventDefault();
+      e.preventDefault(); // Prevent default form submission
       alert('Thank you for your message! I will get back to you soon.');
-      this.reset();
+      this.reset(); // Clear form fields
     });
   }
 });
